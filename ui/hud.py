@@ -1,5 +1,7 @@
 """
 ui/hud.py — Fachada Neural de E.M.E.L.Y (v2.2)
+Sistema EMELY de Seguridad.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 
 Interfaz animada estilo JARVIS que NO revela operaciones de seguridad.
 El intruso solo ve una pantalla bonita con partículas y un orbe.
@@ -191,6 +193,12 @@ class EmelyApp:
             text="SECURITY INTERFACE  ·  ACTIVE",
             fill=_WHITE_DIM,
             font=(_FONT, 10, "bold")
+        )
+        self.cv.create_text(
+            cx, self._sh * 0.92,
+            text="DEVELOPED BY ONI",
+            fill=_VIOLET_DIM,
+            font=(_FONT, 8, "bold")
         )
         self._reloj_tick()
 

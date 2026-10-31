@@ -1,6 +1,7 @@
 """
 notifier.py — Módulo de notificaciones por Telegram.
 Sistema EMELY de Seguridad.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 
 Envía un mensaje + foto al detectar un intruso.
 """
@@ -112,7 +113,8 @@ def notificar_inicio():
 
         _enviar_mensaje(
             f"🟢 <b>E.M.E.L.Y activado</b> — {hora}{link_txt}\n"
-            "<i>Sistema de seguridad en línea y monitoreando.</i>\n\n"
+            "<i>Sistema de seguridad en línea y monitoreando.</i>\n"
+            "<i>Desarrollado por ONI</i>\n\n"
             "🤖 <b>Comandos:</b>\n"
             "📊 /estado  📸 /foto  🔴 /vivo\n"
             "⏸ /pausa  ▶️ /reanudar  🔇 /silencio [h]\n"

@@ -1,5 +1,7 @@
 """
 state.py — Estado compartido de E.M.E.L.Y.
+Sistema EMELY de Seguridad.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 
 Punto central de verdad del sistema.
   · El HUD registra callbacks al arrancar.

@@ -1,6 +1,7 @@
 """
 detector.py — Detección de movimiento + verificación IA de personas.
 Sistema EMELY de Seguridad — Versión Desktop.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 
 Solo dispara alarma si confirma que hay una PERSONA real en el frame.
 Usa MobileNetSSD (modelos/) con fallback a HOG de OpenCV.

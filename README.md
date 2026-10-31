@@ -6,7 +6,10 @@
 
 **Sistema de seguridad inteligente con IA, control remoto por Telegram y transmisión en vivo.**
 
+**Desarrollado por [ONI](https://github.com/simplementeoni-beep)**
+
 ![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=for-the-badge&logo=python&logoColor=white)
+![Developer](https://img.shields.io/badge/Developer-ONI-9d00ff?style=for-the-badge)
 ![OpenCV](https://img.shields.io/badge/OpenCV-5.x-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
 ![YOLOv8](https://img.shields.io/badge/YOLOv8-ONNX-00FFFF?style=for-the-badge)
 ![Telegram](https://img.shields.io/badge/Telegram-Bot_API-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
@@ -245,6 +248,14 @@ Ver [`CHANGELOG.txt`](CHANGELOG.txt) para el historial detallado de cada versió
 - Todas las URLs del stream llevan un **token de seguridad** generado al arrancar
 - El bot solo responde al **Chat ID autorizado** (dueño)
 - La fachada visual oculta la función de vigilancia al intruso
+
+## 👨‍💻 Programador / Autor
+
+Este proyecto fue diseñado, programado y estructurado por:
+
+- **Programador:** **ONI**
+- **GitHub:** [@simplementeoni-beep](https://github.com/simplementeoni-beep)
+- **Repositorio:** [emely-security](https://github.com/simplementeoni-beep/emely-security)
 
 ---
 

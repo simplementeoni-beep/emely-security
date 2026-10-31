@@ -1,5 +1,7 @@
 """
 stream.py — Servidor de transmisión web (Flask / MJPEG).
+Sistema EMELY de Seguridad.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 Responsabilidad única: exponer el video de la cámara por HTTP en /video.
 """
 

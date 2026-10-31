@@ -1,5 +1,6 @@
 # ============================================================
 #   E.M.E.L.Y — Configuración del Sistema de Seguridad
+#   Desarrollador: ONI (https://github.com/simplementeoni-beep)
 # ============================================================
 
 import os

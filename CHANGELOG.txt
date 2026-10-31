@@ -1,6 +1,7 @@
 ╔══════════════════════════════════════════════════════════════════╗
 ║           E.M.E.L.Y — HISTORIAL DE VERSIONES                    ║
 ║           Electronic Monitoring and Emergency Logistics sYstem   ║
+║           Desarrollado y Programado por: ONI                     ║
 ╚══════════════════════════════════════════════════════════════════╝
 
   Formato de versiones: AÑO-NÚMERO

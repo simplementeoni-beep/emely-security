@@ -1,5 +1,7 @@
 """
 tunnel.py — Gestión del túnel SSH de Pinggy.
+Sistema EMELY de Seguridad.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 Responsabilidad única: abrir / mantener / renovar el túnel con auto-reconexión.
 """
 

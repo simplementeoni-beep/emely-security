@@ -1,5 +1,6 @@
 """
 app.py — Punto de entrada de E.M.E.L.Y Security System.
+Desarrollador: ONI (https://github.com/simplementeoni-beep)
 Ejecuta: python app.py
 Orquesta el arranque de módulos; no contiene lógica propia.
 """
@@ -30,6 +31,7 @@ os.makedirs(CARPETA_CAPTURAS, exist_ok=True)
 if __name__ == "__main__":
     print("=" * 55)
     print("  E.M.E.L.Y — SISTEMA DE SEGURIDAD DESKTOP")
+    print("  Desarrollado por: ONI")
     print("=" * 55)
 
     # Iniciar pinggy para túnel de video
