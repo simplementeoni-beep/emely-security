@@ -1,0 +1,368 @@
+╔══════════════════════════════════════════════════════════════════╗
+║           E.M.E.L.Y — HISTORIAL DE VERSIONES                    ║
+║           Electronic Monitoring and Emergency Logistics sYstem   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  Formato de versiones: AÑO-NÚMERO
+  Cada "Año" representa una era de desarrollo del proyecto.
+  Un número mayor = versión más reciente dentro de ese año.
+
+  Estado:  [+] Agregado   [~] Modificado   [!] Corregido   [-] Eliminado
+
+══════════════════════════════════════════════════════════════════
+  AÑO 1  —  NACIMIENTO DEL PROYECTO
+  Fecha: Agosto 2026 (semana 1)
+══════════════════════════════════════════════════════════════════
+
+  v1.0 — "Primer Ojo"
+  ──────────────────────────────────────────────────────────────
+  La versión inicial. Un solo archivo monolítico app.py que
+  ponía en marcha la cámara y mostraba el video en pantalla.
+
+  [+] Captura de video con OpenCV desde la cámara integrada
+  [+] Detección de movimiento por diferencia de frames
+  [+] Interfaz gráfica con Tkinter (ventana básica)
+  [+] Guardado de capturas en carpeta local /capturas
+  [+] config.py con parámetros ajustables (índice de cámara,
+      carpeta de capturas, sensibilidad)
+
+  ──────────────────────────────────────────────────────────────
+
+  v1.1 — "HUD de Stark"
+  ──────────────────────────────────────────────────────────────
+  Se reemplaza la ventana genérica por una interfaz inspirada
+  en el HUD de Iron Man. El sistema empieza a tener identidad.
+
+  [+] Paleta de colores oscura estilo HUD (negro / cyan / rojo)
+  [+] Header con título "E.M.E.L.Y" y badge de estado
+  [+] Panel lateral con métricas en tiempo real:
+        ESTADO / ALERTAS / CAPTURAS / CONFIRMAR
+  [+] Reloj en tiempo real (esquina superior derecha)
+  [+] Log de eventos con timestamps y colores por severidad
+  [+] Galería de miniaturas de capturas recientes
+  [+] Footer con barra de estado inferior
+  [+] Punto "● LIVE" parpadeante en la transmisión
+  [+] Ventana de alerta Toplevel con animación de opacidad
+  [+] Barra de progreso de confirmación (3 capturas antes de alarmar)
+
+  ──────────────────────────────────────────────────────────────
+
+  v1.2 — "Cerebro Detector"
+  ──────────────────────────────────────────────────────────────
+  El sistema deja de activarse con cualquier sombra o movimiento
+  de cortinas. Se agrega inteligencia real para filtrar.
+
+  [+] detector.py — módulo independiente de detección
+  [+] Soporte para MobileNetSSD (detección IA de personas)
+  [+] Heurística geométrica como fallback cuando IA no está:
+        - Filtra contornos por tamaño mínimo y máximo
+        - Relación de aspecto vertical (personas son altas)
+        - Descarta áreas demasiado pequeñas (sombras, hojas)
+  [+] Sistema de confirmación: requiere 3 detecciones seguidas
+      antes de disparar la alarma (evita falsos positivos)
+  [+] Callback on_confirmando / on_alerta / on_standby
+  [+] Overlay de alerta de pantalla completa con botón de cierre
+  [+] Alarma sonora (paplay / aplay como fallback)
+  [+] Alerta de voz con espeak-ng ("¡Intruso detectado!")
+  [+] Parpadeo del badge en estado ALERTA
+
+══════════════════════════════════════════════════════════════════
+  AÑO 1  —  CONECTIVIDAD Y AUTOMATIZACIÓN
+  Fecha: Agosto 2026 (semana 1-2)
+══════════════════════════════════════════════════════════════════
+
+  v1.3 — "Manos Largas"
+  ──────────────────────────────────────────────────────────────
+  EMELY puede avisarte aunque no estés en casa.
+  Se integra Telegram como canal de comunicación bidireccional.
+
+  [+] notifier.py — módulo independiente de notificaciones
+  [+] Notificación automática al iniciar el sistema vía Telegram
+  [+] Notificación automática al apagar el sistema vía Telegram
+  [+] Envío de foto automática al detectar intruso confirmado
+  [+] Comando /estado → reporta modo actual, alertas y capturas
+  [+] Comando /foto   → toma y envía captura manual al instante
+  [+] Comando /pausar → suspende la detección remotamente
+  [+] Comando /reanudar → reactiva la vigilancia remotamente
+  [+] Comando /ayuda  → lista todos los comandos disponibles
+  [+] Long polling para recibir comandos en tiempo real
+  [+] Escucha de comandos en hilo separado (no bloquea la UI)
+
+  ──────────────────────────────────────────────────────────────
+
+  v1.4 — "Túnel Remoto"
+  ──────────────────────────────────────────────────────────────
+  Se puede ver la cámara en vivo desde cualquier lugar del mundo,
+  sin abrir puertos, sin IP fija, sin configuración manual.
+
+  [+] Servidor MJPEG con Flask en puerto 5000
+  [+] Ruta /video para stream de video en tiempo real
+  [+] Ruta / con página HTML mínima para ver el stream en móvil
+  [+] Integración con Pinggy (túnel SSH inverso gratuito)
+  [+] URL pública generada automáticamente al arrancar
+  [+] URL enviada por Telegram al inicio del sistema
+  [+] Comando /vivo → devuelve el enlace de transmisión vigente
+  [+] El frame de video se comparte entre la UI y el stream web
+      mediante variable global thread-safe
+
+══════════════════════════════════════════════════════════════════
+  AÑO 1  —  RESILIENCIA Y AUTONOMÍA
+  Fecha: Agosto 2026 (semana 2)
+══════════════════════════════════════════════════════════════════
+
+  v1.5 — "Inmortal"
+  ──────────────────────────────────────────────────────────────
+  El sistema deja de necesitar supervisión humana para funcionar.
+  Se vuelve un servicio real del sistema operativo.
+
+  [+] emely.service — servicio de systemd para usuario
+  [+] Auto-inicio al encender la computadora
+  [+] Auto-reinicio si el proceso muere (Restart=on-failure)
+  [+] Variables de entorno gráfico inyectadas desde la sesión
+      activa (DISPLAY, XAUTHORITY, WAYLAND_DISPLAY)
+  [+] Compatibilidad con Wayland (Fedora / GNOME moderno)
+  [+] Instalado como servicio de usuario en:
+        ~/.config/systemd/user/emely.service
+
+  ──────────────────────────────────────────────────────────────
+
+  v1.6 — "Sin Sueño"
+  ──────────────────────────────────────────────────────────────
+  La computadora ya no entra en suspensión mientras EMELY vigila.
+  El sistema deja de ser interrumpido por inactividad del usuario.
+
+  [+] systemd-inhibit integrado en el .service
+  [+] Bloqueo de: sleep + idle (suspensión manual y automática)
+  [+] Identificador visible en systemd-inhibit --list:
+        "EMELY Security" con modo BLOCK
+  [+] El bloqueo se libera automáticamente al detener el servicio
+  [+] Auto-reconexión del túnel Pinggy cuando caduca (60 min):
+        - Detecta la caída del proceso SSH
+        - Reconecta automáticamente en 5 segundos
+        - Envía el nuevo link por Telegram con aviso de renovación
+        - /vivo siempre devuelve el link vigente
+
+══════════════════════════════════════════════════════════════════
+  AÑO 1  —  ARQUITECTURA LIMPIA
+  Fecha: Agosto 2026 (semana 2)
+══════════════════════════════════════════════════════════════════
+
+  v1.7 — "Módulos"
+  ──────────────────────────────────────────────────────────────
+  El monolito de 798 líneas se divide en módulos con
+  responsabilidad única. El código vive donde corresponde.
+
+  Estructura antes:
+    app.py  →  798 líneas  (todo mezclado)
+
+  Estructura después:
+    app.py          53 líneas  ← solo punto de entrada
+    stream.py       62 líneas  ← Flask + MJPEG + frame global
+    tunnel.py      112 líneas  ← Pinggy SSH + auto-reconexión
+    ui/__init__.py   1 línea   ← paquete Python
+    ui/constants.py 16 líneas  ← colores y fuentes del HUD
+    ui/hud.py      594 líneas  ← clase EmelyApp completa
+
+  [+] stream.py — servidor de transmisión web independiente
+  [+] tunnel.py — gestión del túnel SSH independiente
+  [+] ui/__init__.py — paquete Python para el directorio ui/
+  [+] ui/constants.py — tokens de diseño (COLOR_*, FUENTE_*)
+  [~] ui/hud.py — clase EmelyApp extraída de app.py
+  [~] app.py — adelgazado a solo orquestación y __main__
+  [!] global_frame_compartido movido a stream.py (acceso cruzado)
+  [!] global_proceso_pinggy movido a tunnel.py (acceso cruzado)
+  [!] Rutas de display gráfico corregidas en emely.service
+      (XAUTHORITY dinámico, no hardcodeado)
+
+══════════════════════════════════════════════════════════════════
+  AÑO 1  —  NUEVA VISIÓN Y SUPERVIVENCIA
+  Fecha: Agosto 2026 (semana 3)
+══════════════════════════════════════════════════════════════════
+
+  v1.8 — "Visión 20/20"
+  ──────────────────────────────────────────────────────────────
+  El antiguo MobileNetSSD en Caffe fue retirado por obsolescencia
+  (OpenCV 5 elimina soporte para Caffe/Darknet). Se migró el motor de
+  inferencia a YOLOv8 Nano en formato ONNX, garantizando 
+  compatibilidad futura, mayor velocidad y máxima precisión.
+
+  [+] Integrado YOLOv8 Nano (ONNX) como detector principal
+  [+] Script download_model.py actualizado para exportar YOLOv8n automáticamente
+  [~] detector.py refactorizado para usar cv2.dnn.readNet nativo con ONNX
+  [~] Procesamiento de tensores adaptado a la salida [1, 84, anchors] de YOLO
+  [-] Eliminados modelos Caffe antiguos y dependencias de _PROTO
+
+══════════════════════════════════════════════════════════════════
+  AÑO 1  —  PANEL Y SISTEMAS DE GESTIÓN
+  Fecha: Agosto 2026 (semana 3)
+══════════════════════════════════════════════════════════════════
+
+  v1.9 — "Core Registry"
+  ──────────────────────────────────────────────────────────────
+  El proyecto ahora cuenta con un panel visual independiente basado en web
+  (Flask + HTML/CSS/JS) con estética estilo HUD / Tony Stark. Permite gestionar,
+  buscar y filtrar dinámicamente todo el historial y roadmap futuro desde SQLite.
+
+  [+] panel.py — nuevo servidor web para el registro
+  [+] Base de datos SQLite integrada (emely.db)
+  [+] templates/registro.html con interfaz gráfica avanzada
+  [+] Migración de CHANGELOG y FUTURO a base de datos dinámica
+
+  v2.0 — "Control Centralizado" ← VERSIÓN ACTUAL
+  ──────────────────────────────────────────────────────────────
+  EMELY deja de depender de demonios y servicios ocultos del sistema
+  para su funcionamiento base. La inmortalidad y el bloqueo de suspensión
+  se atan directamente al ciclo de vida de la aplicación principal, haciéndola
+  más ligera e intuitiva.
+
+  [+] Escudo Inmortal implementado nativamente en app.py mediante subprocess
+  [+] El bloqueo de suspensión (systemd-inhibit) se activa solo al ejecutar app.py
+  [+] Desactivación automática del escudo mediante STDIN pipe closing (graceful & crash safe)
+  [-] Se deshabilitó emely.service para evitar consumo de recursos en segundo plano
+
+  v2.1 — "Clip de Evidencia"
+  ──────────────────────────────────────────────────────────────
+  EMELY ahora graba video real al detectar un intruso confirmado.
+  El clip se guarda localmente y se envía por Telegram automáticamente.
+
+  [+] config.py: CLIP_ACTIVADO, CLIP_DURACION (20s), CLIP_ENVIAR_TELEGRAM
+  [+] detector.py: método _grabar_clip() con fallback de codecs (mp4v/XVID/MJPG)
+  [+] detector.py: _activar_alarma() ahora lanza _grabar_clip() en hilo daemon
+  [+] notifier.py: función notificar_clip() — sube .mp4 vía Telegram sendVideo
+
+══════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════
+  PRÓXIMAS VERSIONES — VER FUTURO.txt / ROADMAP
+══════════════════════════════════════════════════════════════════
+
+  v2.2 — Limpieza y optimización  ← COMPLETADO
+  v2.3 — Control táctico remoto    ← COMPLETADO
+  v2.4 — Zona + Mensajes en vivo   ← COMPLETADO
+  v2.5 — Panel Web Táctico         ← COMPLETADO
+  v2.6 — Reportes Inteligentes     ← COMPLETADO
+  v2.7 — Percepción y Telemetría   ← COMPLETADO
+  v2.8 — Prevista: Reconocimiento Facial / Log en SQLite
+
+══════════════════════════════════════════════════════════════════
+
+  v2.2 — "Higiene Quirúrgica"
+  ──────────────────────────────────────────────────────────────
+  Limpieza profunda del proyecto. Eliminación de código muerto,
+  archivos residuales y optimizaciones de memoria en el bucle
+  principal de video.
+
+  [-] test_clip.py eliminado — script de desarrollo, sin uso
+  [-] download_model.py eliminado — modelo ya instalado
+  [-] panel.py + emely.db + templates/ eliminados — experimento v1.9
+  [-] emely.service eliminado — reemplazado por Escudo Inmortal nativo
+  [-] ui/constants.py eliminado — tokens absorbidos por hud.py
+  [-] _cargar_hog() y _hog eliminados — nunca se usaban en detección
+  [-] obtener_galeria() eliminada — la galería UI fue retirada en v2.0
+  [~] thresh.copy() → thresh en findContours (innecesario en OpenCV 5)
+  [~] frame.copy() eliminados en bucle de video — menos presión de GC
+
+══════════════════════════════════════════════════════════════════
+
+  v2.3 — "Control Táctico"
+  ──────────────────────────────────────────────────────────────
+  Nuevas capacidades de control remoto desde Telegram:
+  reglas configurables en tiempo real y apagado seguro.
+
+  [+] Comando /pausa (alias de /pausar) — soluciona bug de comando
+  [+] Comando /apagar — cierra el sistema de forma limpia remotamente
+  [+] Comando /regla — modifica parámetros en tiempo real sin reiniciar:
+        /regla personas N   → mínimo de intrusos para detonar alarma
+        /regla capturas N   → fotos de confirmación requeridas
+        /regla cooldown N   → segundos entre alertas
+        /regla sensibilidad N → área mínima de movimiento (píxeles²)
+  [+] config.MINIMO_PERSONAS_ALARMA — nueva variable de umbral grupal
+  [+] Auto-encuadre con zoom — al primer frame de confirmación genera
+        zoom_*.jpg recortando alrededor del intruso detectado
+  [~] detector.py: todas las variables dinámicas ahora se leen de
+        config.VAR en tiempo real (no más caché de importación)
+  [~] /estado ahora muestra reglas activas y tiempo de silencio restante
+
+══════════════════════════════════════════════════════════════════
+
+  v2.4 — "Ojos y Voz"
+  ──────────────────────────────────────────────────────────────
+  EMELY ahora tiene zona de vigilancia configurable remotamente
+  y comunicación bidireccional de voz y texto.
+
+  [+] Comando /zona — define rectángulo de vigilancia en porcentajes:
+        /zona X1 Y1 X2 Y2  → rectángulo (% del frame 640×480)
+        /zona ver          → foto con la zona dibujada en naranja
+        /zona off          → vigilar toda la cámara
+      La zona se dibuja en tiempo real sobre el video en vivo.
+  [+] Comando /mensaje [texto] — quema texto en el stream en vivo
+        (aparece 15s en la parte inferior, con fondo semitransparente)
+  [+] Nota de voz por Telegram → se descarga y reproduce por altavoces
+        (paplay como motor principal, ffplay como fallback)
+        El stream muestra "🎤 MENSAJE DE VOZ ENTRANTE" mientras suena
+  [+] stream.set_mensaje_overlay() — sistema de overlay en MJPEG
+  [+] notifier.descargar_voz() — descarga OGG de la API de Telegram
+  [~] notifier._poll(): detecta tanto texto como mensajes de voz
+  [~] stream.py: generar_stream() aplica overlay antes de codificar
+  [~] hud.py: import numpy as np agregado
+
+══════════════════════════════════════════════════════════════════
+  v2.5 — "Panel Web Táctico" (10-Oct-2026)
+  ──────────────────────────────────────────────────────────────
+  EMELY ahora cuenta con una interfaz web avanzada estilo HUD de
+  videojuego. Permite control total desde cualquier dispositivo
+  con soporte de orientación dinámica y dibujos táctiles.
+
+  [+] web/templates/panel.html — Interfaz web táctica (gamepad style)
+  [+] Diseño inmersivo de pantalla completa con el video como fondo
+  [+] Forzado a modo horizontal (landscape) automático en teléfonos
+  [+] Dibujo táctil (touch) de la zona de vigilancia en el navegador
+  [+] state.py — Nuevo módulo de estado global (Singleton thread-safe)
+        para sincronizar el HUD local, el servidor web y Telegram
+  [+] API REST local en stream.py (/api/estado, /api/foto, etc.)
+  [!] Rollback estético: Telegram vuelve a usar sus emojis clásicos
+        en lugar del estilo "caja de terminal" que resultó molesto
+  [~] app.py, ui/hud.py, stream.py refactorizados para usar state.py
+
+══════════════════════════════════════════════════════════════════
+
+  v2.6 — "Reportes Inteligentes" (10-Oct-2026)
+  ──────────────────────────────────────────────────────────────
+  EMELY ahora es capaz de analizar su propia actividad y decidir
+  cuándo es necesario informarte sobre su tiempo de vigilancia.
+
+  [+] Hilo en background _loop_reporte_diario() en notifier.py
+  [+] Reporte diario automático que se envía por Telegram a las 23:55
+  [+] Reporte de cierre de sesión al ejecutar /apagar o cerrar la app
+  [!] Filtro inteligente: Los reportes detallados SOLO se envían
+        si el sistema estuvo activo más de 1 hora continua, o si
+        detectó al menos 1 amenaza. Evita spam en sesiones cortas.
+  [+] state.py: nueva variable "tiempo_inicio" para rastrear la sesión.
+
+══════════════════════════════════════════════════════════════════
+
+  v2.7 — "Percepción Avanzada" (10-Oct-2026)
+  ──────────────────────────────────────────────────────────────
+  [+] Mapa de Calor Visual (Heatmap): La IA ahora dibuja en 
+        tiempo real un mapa térmico persistente (con enfriamiento)
+        sobre las áreas donde detecta personas. 
+  [+] Botón "MAPA TÉRMICO" en el panel web.
+  [+] Comando /mapa en Telegram para alternarlo remotamente.
+  [+] Telemetría Avanzada: Lectura de CPU, RAM y Disco en tiempo real
+        usando psutil. Se muestra en el comando /estado de Telegram
+        y se actualiza en vivo en el Panel Web.
+
+══════════════════════════════════════════════════════════════════
+  ESTADÍSTICAS DEL PROYECTO (a v2.7)
+══════════════════════════════════════════════════════════════════
+
+  Líneas de código total:   ~1,400 líneas (Python + HTML/CSS/JS)
+  Módulos propios:          6 archivos .py (app, config, detector,
+                            notifier, state, stream, tunnel, ui/hud)
+  Dependencias externas:    opencv-python, flask, pillow, requests
+  Servicios del sistema:    0 (centralizado nativamente)
+  Comandos Telegram:        10 (/estado /foto /vivo /pausa /reanudar
+                               /silencio /regla /zona /mensaje /apagar
+                               + nota de voz)
+  Duración del desarrollo:  ~1 mes
+
+══════════════════════════════════════════════════════════════════

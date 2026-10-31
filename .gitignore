@@ -1,0 +1,41 @@
+# ── Credenciales y secretos ────────────────────────────────────
+.env
+*.pem
+*.key
+id_emely*
+
+# ── Capturas y evidencias ──────────────────────────────────────
+capturas/
+*.mp4
+
+# Excepción: mantener la foto de perfil del proyecto
+!emely.jpg
+
+# ── Python ─────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.ruff_cache/
+.mypy_cache/
+
+# ── Modelos (pueden ser muy pesados) ───────────────────────────
+# Comenta esta línea si quieres versionar los modelos pequeños
+modelos/*.onnx
+modelos/*.caffemodel
+modelos/*.pb
+
+# ── Entornos virtuales ──────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── IDEs ────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.agents/
+
+# ── Sistema ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+

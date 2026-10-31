@@ -1,0 +1,217 @@
+╔══════════════════════════════════════════════════════════════════╗
+║           E.M.E.L.Y — ROADMAP DE IDEAS FUTURAS                  ║
+║           Creado: Agosto 2026                                    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Leyenda:
+  [ ] = Pendiente
+  [~] = En progreso
+  [x] = Completado
+
+══════════════════════════════════════════════════════════════════
+  PRIORIDAD 0 — MEJORAS TÉCNICAS URGENTES
+══════════════════════════════════════════════════════════════════
+
+[x] Persistencia al suspender / reposo
+      El sistema se desactiva cuando la PC entra en reposo.
+      Solución: inhibir el suspendido con systemd-inhibit o
+      configurar el servicio para auto-recuperarse al despertar.
+      También evaluar configurar la PC para no suspenderse
+      mientras emely.service esté activo.
+      Dificultad: Fácil-Media | Requiere: systemd / logind
+      ✅ COMPLETADO — Escudo Inmortal nativo en app.py (centralizado)
+
+[ ] Mejorar el panel visual (HUD)
+      La interfaz ya usa fachada neural JARVIS con imagen de fondo,
+      partículas y orbe. Pendiente: indicador visual del estado de
+      Pinggy/tunnel en el HUD sin romper el disfraz.
+      Dificultad: Media | Requiere: nada nuevo
+
+[x] Dividir app.py en sub-módulos
+      app.py ya tiene ~800 líneas y seguirá creciendo.
+      Separar en módulos independientes:
+        ui/hud.py        → toda la interfaz tkinter       ✅
+        ui/constants.py  → colores y fuentes              ✅
+        stream.py        → servidor Flask / MJPEG         ✅
+        tunnel.py        → Pinggy SSH + auto-reconexión   ✅
+      app.py queda solo como punto de entrada y orquestador.
+      Dificultad: Media | Requiere: refactoring cuidadoso
+      ✅ COMPLETADO — app.py pasó de 798 → 53 líneas
+
+[x] Migrar Detector a ONNX (YOLOv8)
+      El motor antiguo en Caffe/Darknet fue retirado en OpenCV 5.
+      Reemplazar con modelo moderno ONNX (YOLOv8 Nano).
+      ✅ COMPLETADO — YOLOv8n ONNX integrado exitosamente (v1.8)
+
+══════════════════════════════════════════════════════════════════
+  PRIORIDAD 1 — INTELIGENCIA SITUACIONAL
+══════════════════════════════════════════════════════════════════
+
+[ ] Análisis de patrones
+      Aprender horarios de movimiento habituales.
+      Detectar y alertar si hay actividad en horas inusuales.
+      "Detecté movimiento a las 3am — 3 veces esta semana."
+      Dificultad: Media | Requiere: sqlite3 (incluido en Python)
+
+[ ] Mapa de calor
+      Visualizar en el video qué zonas tienen más actividad.
+      Acumular movimiento en array numpy y mostrarlo como overlay.
+      Dificultad: Fácil | Requiere: numpy + cv2 (ya instalados)
+
+[x] Resumen diario automático por Telegram
+      Reporte automático cada noche con lo que pasó en el día.
+      Total de detecciones, horas pico, capturas guardadas.
+      Dificultad: Fácil | Requiere: nada nuevo
+      ✅ COMPLETADO (10-Oct-2026) — Reporte diario a las 23:55 y reporte de cierre en notificar_apagado()
+
+[x] Estado del entorno
+      Mostrar en HUD: temperatura CPU, uso RAM, brillo estimado.
+      Dificultad: Media | Requiere: psutil (pip install psutil)
+      ✅ COMPLETADO (10-Oct-2026) — Integrado uso de CPU, RAM y Disco en Panel Web y /estado
+
+══════════════════════════════════════════════════════════════════
+  PRIORIDAD 2 — PERCEPCIÓN AVANZADA
+══════════════════════════════════════════════════════════════════
+
+[x] Grabación de clip al detectar
+      Guardar video de 10-30s cuando hay movimiento confirmado.
+      Evidencia real, no solo foto estática.
+      ✅ COMPLETADO — _grabar_clip() en detector.py, envío por Telegram en notifier.py (v2.1)
+
+[x] Foto automática al Telegram al detectar
+      Mandar la foto del intruso en el momento de la alerta.
+      ✅ COMPLETADO — detector.py envía fotos vía notifier.py al confirmar intruso
+
+[x] Horario activo configurable
+      "Solo vigilar de 22:00 a 07:00" para evitar alertas de día.
+      ✅ COMPLETADO — HORARIO_ACTIVO en config.py, evaluado en cada frame
+
+[x] Zonas de detección / ignorar áreas
+      Ignorar la calle o una zona específica del encuadre.
+      Solo vigilar zonas que definas (puerta, ventana, etc).
+      ✅ COMPLETADO — /zona desde Telegram, poligono de vigilancia activo (v2.4)
+
+[x] Zoom digital automático
+      Enfocar la zona donde detectó la persona al activarse.
+      ✅ COMPLETADO — Auto-encuadre: genera zoom_*.jpg en la primera confirmación (v2.3)
+
+[ ] Tracking de movimiento
+      Seguir al objeto detectado con recuadro en tiempo real.
+
+[ ] Detección de postura
+      Distinguir: de pie, agachado, corriendo.
+
+══════════════════════════════════════════════════════════════════
+  PRIORIDAD 3 — INTERFAZ Y CONTROL
+══════════════════════════════════════════════════════════════════
+
+[x] Comandos Telegram — modo silencioso temporal
+      /silencio [h] — para cuando sabes que habrá movimiento.
+      ✅ COMPLETADO — /silencio con duración en horas (v1.3+)
+
+[x] Apagado remoto seguro
+      Cerrar EMELY desde el teléfono sin acceso físico a la PC.
+      ✅ COMPLETADO — /apagar llama a _cerrar() de forma segura (v2.3)
+
+[x] Reglas configurables remotamente
+      Cambiar sensibilidad, umbral de personas y cooldown sin reiniciar.
+      ✅ COMPLETADO — /regla en tiempo real, modifica config.VAR (v2.3)
+
+[x] Mensajes en el stream en vivo
+      Enviar texto o voz desde el teléfono que aparezca/suene en la PC.
+      ✅ COMPLETADO — /mensaje + nota de voz por altavoces (v2.4)
+
+[ ] Alertas por nivel de amenaza
+      Distinguir "movimiento leve" vs "persona confirmada".
+
+[ ] Historial / log de eventos en SQLite con timestamps
+      Registro persistente de todo lo que pasó y cuándo.
+
+[x] Dashboard web local
+      Ver la cámara desde el celular en la misma red WiFi.
+      Sin necesidad de Pinggy, funciona en red local.
+      ✅ COMPLETADO (10-Oct-2026) — Panel Web Táctico integrado (v2.5)
+
+[ ] Multi-cámara
+      Soporte para varias cámaras, una sola EMELY coordina todo.
+
+══════════════════════════════════════════════════════════════════
+  PRIORIDAD 4 — ESTILO TONY STARK / IA AVANZADA
+══════════════════════════════════════════════════════════════════
+
+[ ] Reconocimiento de caras conocidas
+      Distinguir familia vs desconocidos.
+      Alertar solo con caras que no reconoce.
+
+[ ] Comandos de voz locales (sin internet)
+      Activar/desactivar EMELY por voz.
+      Wake word: "EMELY"
+
+[ ] Respuestas habladas (TTS)
+      EMELY confirma acciones en voz: "Perímetro asegurado."
+
+[ ] Integración con luces smart WiFi/Bluetooth (LED)
+      Al detectar un intruso, EMELY cambia el color de los focos
+      conectados a la red (Govee, TP-Link Kasa, Yeelight, Tuya...).
+      Comportamiento propuesto:
+        - Detección confirmada → Luces rojas parpadeando (alarma)
+        - Modo silencio / standby → Luces verdes suaves
+        - Alarma cancelada → Vuelven al color original
+      Dificultad: Media | Requiere: python-tplink-smartplug / govee-api
+      Nota: Focos Tuya tienen API local sin necesitar internet.
+
+[ ] Sistema de disuasión activa — "EMELY te ve"
+      Cuando se detecta un intruso, en una pantalla dentro del
+      hogar aparece la cara del dueño junto con su voz.
+      El intruso cree que hay alguien en casa vigilándolo.
+      
+      Implementación propuesta:
+        A) PC con monitor secundario: stream local de cámara/foto
+           del dueño + audio de su voz (pre-grabado o en vivo).
+        B) Chromecast / Fire Stick: EMELY envía señal al TV
+           para que muestre la "presencia virtual" del dueño.
+        C) Altavoz Bluetooth: reproduce voz del dueño al detectar.
+      
+      Modes de operación:
+        - Voz pregrabada: "¡Te veo! La policía ya fue alertada."
+        - Video en vivo: El dueño habla desde el celular, su cara
+          aparece en la pantalla del hogar en tiempo real (1-way).
+        - IA generativa (futuro): EMELY genera una respuesta
+          de voz de forma autónoma sin que el dueño intervenga.
+      
+      Dificultad: Media-Alta | Requiere: ffmpeg / pychromecast / BT
+      Idea central: de vigilancia PASIVA a disuasión ACTIVA.
+
+[ ] Modo "estoy en casa"
+      Desactivar vigilancia automáticamente cuando llegas.
+
+[ ] Detección de objetos abandonados
+      "Se dejó una bolsa sin dueño por X minutos."
+
+══════════════════════════════════════════════════════════════════
+  VISIÓN A LARGO PLAZO — PROYECTO EMELY COMPLETO
+══════════════════════════════════════════════════════════════════
+
+[ ] Integrar sistema de seguridad con asistente IA EMELY
+      El sistema de seguridad será los "ojos" del asistente.
+      EMELY podrá ver, analizar y reportar de forma autónoma.
+
+[ ] Arquitectura JARVIS completa:
+      ├── 👁️  Sistema de seguridad     ← BASE YA CONSTRUIDA ✅ (v2.7)
+      ├── 💡  Control del entorno       ← Luces Smart (próxima era)
+      ├── 📺  Disuasión activa          ← Tu cara + voz en pantalla
+      ├── 🎤  Voz / comandos naturales  ← Nota de voz (Telegram) ✅ parcial
+      └── 🧠  Contexto / memoria / aprendizaje
+
+══════════════════════════════════════════════════════════════════
+  NOTAS PERSONALES
+══════════════════════════════════════════════════════════════════
+
+- Inspiración: Tony Stark / JARVIS
+- El objetivo no es vender, es tener tu propia infraestructura.
+- Construirlo tú mismo significa que no hay cajas negras.
+- Cada feature que agregas es aprendizaje real.
+- Visión central: pasar de cámara de vigilancia pasiva a un
+  sistema que REACCIONA, INTIMIDA y tiene presencia propia.
+
+══════════════════════════════════════════════════════════════════

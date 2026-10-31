@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>E.M.E.L.Y - TACTICAL HUD</title>
+    <style>
+        :root {
+            --accent: #9d00ff;
+            --alert: #ff003c;
+            --success: #00ff88;
+            --panel-bg: rgba(10, 10, 15, 0.6);
+            --font: 'Courier New', Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: var(--font);
+            color: white;
+            overscroll-behavior: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Fuerza modo horizontal estilo videojuego centrado perfectamente */
+        @media screen and (orientation: portrait) {
+            body {
+                width: 100vh;
+                height: 100vw;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-90deg);
+            }
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- VIDEO DE FONDO --- */
+        #video-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+        #video-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Para llenar como un juego */
+        }
+        
+        /* Efecto scanline y esquinas de cámara */
+        #video-bg::after {
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(157,0,255,0.05) 1px, transparent 1px);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #zone-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3; pointer-events: none;
+        }
+        .drawing-active #zone-canvas { pointer-events: auto; cursor: crosshair; }
+
+        /* --- INTERFAZ HUD TIPO JUEGO --- */
+        #hud-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            pointer-events: none; /* Para dejar clics pasar al canvas si no es un botón */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .hud-element { pointer-events: auto; }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .title { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; color: var(--accent); }
+        .status-box {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--panel-bg);
+            padding: 5px 15px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .dot { width: 10px; height: 10px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
+        .dot.alert { background: var(--alert); box-shadow: 0 0 8px var(--alert); animation: pulse 1s infinite; }
+        .dot.paused { background: #ffaa00; box-shadow: 0 0 8px #ffaa00; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* PANELES LATERALES (GAMEPAD STYLE) */
+        .side-panels {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex: 1;
+            padding-bottom: 10px;
+            gap: 10px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(157, 0, 255, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            min-width: 180px;
+        }
+
+        .panel-title {
+            font-size: 0.75rem; color: var(--accent);
+            border-bottom: 1px solid rgba(157, 0, 255, 0.4);
+            padding-bottom: 5px; margin-bottom: 10px; text-transform: uppercase;
+        }
+
+        /* BOTONES GRANDES (ESTILO TÁCTIL) */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            background: rgba(157, 0, 255, 0.1);
+            color: white;
+            border: 1px solid var(--accent);
+            padding: 12px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: var(--font);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        button:active { background: var(--accent); transform: scale(0.95); }
+        button.alert-btn { border-color: var(--alert); color: var(--alert); }
+        button.alert-btn:active { background: var(--alert); color: white; }
+        
+        button.wide { grid-column: span 2; }
+
+        /* INFO GRID */
+        .info-grid {
+            display: grid; grid-template-columns: auto 1fr; gap: 8px;
+            font-size: 0.75rem;
+        }
+        .info-label { color: #aaa; }
+        .info-value { color: white; font-weight: bold; text-align: right; text-shadow: 0 1px 2px black; }
+
+        /* TOAST */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-50px);
+            background: var(--panel-bg); border: 1px solid var(--accent);
+            padding: 8px 20px; color: var(--success); opacity: 0;
+            transition: all 0.3s; z-index: 100; border-radius: 20px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Mirilla central */
+        .crosshair {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; pointer-events: none; z-index: 11;
+        }
+        .crosshair::before, .crosshair::after { content: ""; position: absolute; background: rgba(255,255,255,0.3); }
+        .crosshair::before { top: 50%; left: 0; width: 100%; height: 1px; }
+        .crosshair::after { top: 0; left: 50%; width: 1px; height: 100%; }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    
+    <!-- VIDEO FULLSCREEN -->
+    <div id="video-bg">
+        <img src="/video?t={{ token }}" alt="Señal Perdida">
+        <canvas id="zone-canvas"></canvas>
+    </div>
+    
+    <div class="crosshair"></div>
+
+    <!-- HUD CAPA SUPERIOR -->
+    <div id="hud-layer">
+        
+        <header class="hud-element">
+            <div class="title">E.M.E.L.Y // O.S.</div>
+            <div class="status-box">
+                <div class="dot" id="status-dot"></div>
+                <span id="status-text">EN LÍNEA</span>
+            </div>
+        </header>
+
+        <div class="side-panels">
+            <!-- PANEL IZQUIERDO: INFO -->
+            <div class="panel hud-element">
+                <div class="panel-title">Telemetría</div>
+                <div class="info-grid">
+                    <div class="info-label">MODO:</div>
+                    <div class="info-value" id="info-modo">VIGILANDO</div>
+                    <div class="info-label">ALERTAS:</div>
+                    <div class="info-value" id="info-alertas">0</div>
+                    <div class="info-label">FOTOS:</div>
+                    <div class="info-value" id="info-fotos">0</div>
+                    <div class="info-label">SILENCIO:</div>
+                    <div class="info-value" id="info-silencio">NO</div>
+                    <div class="info-label">CPU:</div>
+                    <div class="info-value" id="info-cpu">--%</div>
+                    <div class="info-label">RAM:</div>
+                    <div class="info-value" id="info-ram">--%</div>
+                    <div class="info-label">DISCO:</div>
+                    <div class="info-value" id="info-disco">--%</div>
+                </div>
+            </div>
+
+            <!-- PANEL DERECHO: CONTROLES -->
+            <div class="panel hud-element">
+                <div class="panel-title">Táctico</div>
+                <div class="btn-grid">
+                    <button onclick="apiCall('foto')">CAPTURA</button>
+                    <button onclick="apiCall('pausa')" id="btn-pausa">PAUSAR</button>
+                    <button onclick="apiCall('reanudar')" id="btn-reanudar" style="display:none; border-color:#ffaa00; color:#ffaa00;">REANUDAR</button>
+                    
+                    <button class="wide" onclick="toggleZoneMode()" id="btn-zona">ZONA DE VIGILANCIA</button>
+                    
+                    <div id="zone-controls" class="wide" style="display:none; gap:10px;">
+                        <button onclick="clearZone()" style="width:48%; border-color:var(--success); color:var(--success);">BORRAR</button>
+                        <button onclick="toggleZoneMode()" style="width:48%;">CANCEL</button>
+                    </div>
+
+                    <button class="wide" onclick="apiCall('mapa')" style="border-color:#e67e22; color:#e67e22;">MAPA TÉRMICO</button>
+
+                    <button class="wide alert-btn" onclick="apiCall('apagar')">APAGAR SISTEMA</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast hud-element" id="toast">Comando ejecutado.</div>
+
+<script>
+    const token = "{{ token }}";
+    const statusText = document.getElementById('status-text');
+    const statusDot = document.getElementById('status-dot');
+    const toastEl = document.getElementById('toast');
+
+    // --- Evitar scroll en moviles ---
+    document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+
+    // --- Fullscreen toggle ---
+    document.body.addEventListener('dblclick', () => {
+        if (!document.fullscreenElement) { document.body.requestFullscreen().catch(err => {}); }
+        else { document.exitFullscreen(); }
+    });
+
+    async function apiCall(action, payload = {}) {
+        try {
+            const res = await fetch(`/api/${action}?t=${token}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === 'ok') {
+                showToast(`[ ${action.toUpperCase()} OK ]`);
+                updateState();
+            } else {
+                showToast(`[ ERROR: ${data.msg} ]`);
+            }
+        } catch (e) {
+            showToast('[ ERROR DE CONEXIÓN ]');
+        }
+    }
+
+    function showToast(msg) {
+        toastEl.innerText = msg;
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), 3000);
+    }
+
+    async function updateState() {
+        try {
+            const res = await fetch(`/api/estado?t=${token}`);
+            const state = await res.json();
+            
+            document.getElementById('info-modo').innerText = state.modo;
+            document.getElementById('info-alertas').innerText = state.total_alertas;
+            document.getElementById('info-fotos').innerText = state.total_capturas;
+            document.getElementById('info-silencio').innerText = state.en_silencio ? 'SÍ' : 'NO';
+            document.getElementById('info-cpu').innerText = state.cpu > 0 ? state.cpu.toFixed(1) + '%' : '--%';
+            document.getElementById('info-ram').innerText = state.ram > 0 ? state.ram.toFixed(1) + '%' : '--%';
+            document.getElementById('info-disco').innerText = state.disk > 0 ? state.disk.toFixed(1) + '%' : '--%';
+
+            if (state.modo === 'PAUSADO') {
+                statusText.innerText = 'EN ESPERA';
+                statusDot.className = 'dot paused';
+                document.getElementById('btn-pausa').style.display = 'none';
+                document.getElementById('btn-reanudar').style.display = 'block';
+            } else if (state.modo === 'ALERTA') {
+                statusText.innerText = 'ALERTA ROJA';
+                statusDot.className = 'dot alert';
+                document.getElementById('btn-pausa').style.display = 'block';
+                document.getElementById('btn-reanudar').style.display = 'none';
+            } else {
+                statusText.innerText = 'EN LÍNEA';
+                statusDot.className = 'dot';
+                document.getElementById('btn-pausa').style.display = 'block';
+                document.getElementById('btn-reanudar').style.display = 'none';
+            }
+        } catch (e) {
+            statusText.innerText = 'OFFLINE';
+            statusDot.className = 'dot alert';
+        }
+    }
+
+    setInterval(updateState, 2000);
+    updateState();
+
+    // --- Zone Drawing ---
+    const canvas = document.getElementById('zone-canvas');
+    const ctx = canvas.getContext('2d');
+    const wrapper = document.getElementById('video-bg');
+    let drawing = false;
+    let zoneMode = false;
+    let startX, startY;
+
+    function resizeCanvas() {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleZoneMode() {
+        zoneMode = !zoneMode;
+        if (zoneMode) {
+            document.getElementById('game-container').classList.add('drawing-active');
+            document.getElementById('btn-zona').style.display = 'none';
+            document.getElementById('zone-controls').style.display = 'flex';
+            showToast('DIBUJA SOBRE LA PANTALLA');
+        } else {
+            document.getElementById('game-container').classList.remove('drawing-active');
+            document.getElementById('btn-zona').style.display = 'block';
+            document.getElementById('zone-controls').style.display = 'none';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function clearZone() {
+        apiCall('zona', { zone: 'off' });
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        toggleZoneMode();
+    }
+
+    // Touch and Mouse support mapping — Corregido para modo portrait con CSS rotate(-90deg)
+    function getEventPos(e) {
+        e.preventDefault();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else if (e.changedTouches && e.changedTouches.length > 0) {
+            clientX = e.changedTouches[0].clientX;
+            clientY = e.changedTouches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
+        const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+        
+        if (isPortrait) {
+            // El body está rotado -90deg alrededor de su centro (50%, 50%)
+            // Cuando el body se rota -90deg, el eje X visual del usuario es el eje Y lógico
+            // y el eje Y visual del usuario es el eje X lógico invertido.
+            // Necesitamos transformar del espacio de pantalla al espacio del canvas rotado.
+            const screenW = window.screen.width;
+            const screenH = window.screen.height;
+            // La pantalla física es portrait: ancho=screenW, alto=screenH
+            // El body rotado tiene: ancho lógico = screenH, alto lógico = screenW
+            // Transformación: x_canvas = clientY, y_canvas = screenW - clientX
+            // Pero ajustando al tamaño real del canvas
+            const cx = clientY * (canvas.width / screenH);
+            const cy = (screenW - clientX) * (canvas.height / screenW);
+            return { x: cx, y: cy };
+        } else {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+    }
+
+    function startDraw(e) {
+        if (!zoneMode) return;
+        drawing = true;
+        const pos = getEventPos(e);
+        startX = pos.x; startY = pos.y;
+    }
+
+    function moveDraw(e) {
+        if (!drawing || !zoneMode) return;
+        const pos = getEventPos(e);
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#00ff88'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+        ctx.strokeRect(startX, startY, pos.x - startX, pos.y - startY);
+        ctx.fillStyle = 'rgba(0, 255, 136, 0.15)';
+        ctx.fillRect(startX, startY, pos.x - startX, pos.y - startY);
+    }
+
+    function endDraw(e) {
+        if (!drawing || !zoneMode) return;
+        drawing = false;
+        const pos = getEventPos(e);
+
+        const x1p = Math.min(startX, pos.x) / canvas.width * 100;
+        const y1p = Math.min(startY, pos.y) / canvas.height * 100;
+        const x2p = Math.max(startX, pos.x) / canvas.width * 100;
+        const y2p = Math.max(startY, pos.y) / canvas.height * 100;
+
+        if (Math.abs(pos.x - startX) > 20 && Math.abs(pos.y - startY) > 20) {
+            apiCall('zona', { coords: [x1p, y1p, x2p, y2p] });
+            setTimeout(() => toggleZoneMode(), 1000);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchmove', moveDraw);
+    canvas.addEventListener('touchend', endDraw);
+
+</script>
+</body>
+</html>
