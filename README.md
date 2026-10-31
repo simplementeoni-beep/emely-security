@@ -15,6 +15,7 @@
 ![Telegram](https://img.shields.io/badge/Telegram-Bot_API-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Web_Server-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-Desktop-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+![License](https://img.shields.io/badge/License-Apache_2.0-008080?style=for-the-badge&logo=apache)
 
 </div>
 
@@ -261,7 +262,9 @@ Este proyecto fue diseñado, programado y estructurado por:
 
 ## 📄 Licencia
 
-Proyecto personal de uso educativo y doméstico.
+Este proyecto está bajo la Licencia **Apache 2.0** — Consulta el archivo [`LICENSE`](LICENSE) para más detalles.
+
+Copyright © 2026 **ONI**.
 
 ---
 
